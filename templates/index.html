@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>TasqueWave</title>
+</head>
+<body>
+    <h1>TasqueWave</h1>
+    <a href="/add">Add Task</a>
+    <ul>
+        {% for task in tasks %}
+        <li>{{ task.title }} - {{ task.priority }} - {{ task.due_date }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
