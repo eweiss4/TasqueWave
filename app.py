@@ -13,9 +13,12 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 db.init_app(app)
 
 @app.route('/')
+@app.route('/')
 def index():
-    tasks = Task.query.all()
+    # Sort by priority and then by due date (ascending order for both)
+    tasks = Task.query.order_by(Task.priority.asc(), Task.due_date.asc()).all()
     return render_template('index.html', tasks=tasks)
+
 
 @app.route('/add', methods=['GET', 'POST'])
 def add_task():
@@ -31,7 +34,15 @@ def add_task():
         db.session.add(task)
         db.session.commit()
         return redirect(url_for('index'))
-    return render_template('add_task.html', form=form)
+    return render_template('add_task.html', form = form)
+
+@app.route('/delete/<int:task_id>', methods=['POST'])
+def delete_task(task_id):
+    task = Task.query.get(task_id)
+    if task:
+        db.session.delete(task)
+        db.session.commit()
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():
