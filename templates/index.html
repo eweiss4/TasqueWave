@@ -9,13 +9,26 @@
 <body>
     <h1>TasqueWave</h1>
     <a href="{{ url_for('add_task') }}">Add New Task</a>
-    <table>
+    <div>
+        <label for="tagFilter">Filter by Tag:</label>
+        <select id="tagFilter" onchange="filterByTag()">
+            <option value="" {% if not filter_tag %}selected{% endif %}>All Tasks</option>
+            {% for tag in tags %}
+            <option value="{{ tag.name }}" {% if filter_tag == tag.name %}selected{% endif %}>
+                {{ tag.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    </div>
+    <table class="table table-striped">
         <thead>
             <tr>
                 <th>Title</th>
                 <th>Due Date</th>
                 <th>Priority</th>
                 <th>Status</th>
+                <th>Tags</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -27,13 +40,68 @@
                 <td>{{ task.priority }}</td>
                 <td>{{ task.status }}</td>
                 <td>
-                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST">
-                        <button type="submit" onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
+                    {% for tag in task.tags %}
+                        <a href="{{ url_for('filter_by_tag', tag_name=tag.name) }}" class="tag-badge">{{ tag.name }}</a>
+                    {% endfor %}
+                </td>
+                <td>
+                    <button class="btn btn-info btn-sm" onclick="showDescription('{{ task.title }}', '{{ task.description }}')">
+                        View Description
+                    </button>
+                    <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="display: inline;">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
                     </form>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+        </div>
+    </div>
 </body>
 </html>
+<script>
+    // Function to show the modal with the task description
+    function showDescription(title, description) {
+        // Get the modal element
+        const modal = document.getElementById('descriptionModal');
+        
+        // Set the title and description in the modal
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalDescription').innerText = description;
+        
+        // Display the modal
+        modal.style.display = 'block';
+    }
+
+    // Function to close the modal
+    function closeModal() {
+        const modal = document.getElementById('descriptionModal');
+        modal.style.display = 'none';
+    }
+
+    // Close the modal if the user clicks outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('descriptionModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+
+    function filterByTag() {
+        // Get the selected tag from the dropdown
+        const selectedTag = document.getElementById('tagFilter').value;
+
+        // Redirect to the appropriate filtering route
+        if (selectedTag) {
+            window.location.href = `/filter/${selectedTag}`;
+        } else {
+            window.location.href = `/`; // Redirect to show all tasks
+        }
+    }
+</script>
