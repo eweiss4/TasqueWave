@@ -14,11 +14,10 @@ db.init_app(app)
 
 @app.route('/')
 def index():
-    # Query all tasks
     tasks = Task.query.order_by(Task.priority.asc(), Task.due_date.asc()).all()
-    # Query all tags
     tags = Tag.query.all()
-    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=None)
+    form = TaskForm()  # Create an instance of the TaskForm
+    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=None, form=form)
 
 
 @app.route('/add', methods=['GET', 'POST'])
@@ -57,13 +56,11 @@ def delete_task(task_id):
 
 @app.route('/filter/<string:tag_name>')
 def filter_by_tag(tag_name):
-    # Query the selected tag
     tag = Tag.query.filter_by(name=tag_name).first()
-    # Get tasks associated with the selected tag
     tasks = tag.tasks.order_by(Task.priority.asc(), Task.due_date.asc()).all() if tag else []
-    # Query all tags for the dropdown
     tags = Tag.query.all()
-    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name)
+    form = TaskForm()  # Create an instance of the TaskForm
+    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name, form=form)
 
 if __name__ == '__main__':
     with app.app_context():
