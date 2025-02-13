@@ -1,41 +1,35 @@
-table {
-    width: 100%;
-    border-collapse: collapse;
+/* Add padding and spacing to table cells */
+.table td, .table th {
+    padding: 15px;
+    text-align: center;
+    vertical-align: middle;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+/* Add a subtle shadow to the table */
+.table {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px; /* Rounded corners */
+    overflow: hidden;
 }
 
-th {
-    background-color: #f4f4f4;
+/* Style the table header */
+.table thead th {
+    background-color: #f8f9fa; /* Light gray background */
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 2px solid #dee2e6;
 }
 
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
+/* Add hover effect to rows */
+.table-hover tbody tr:hover {
     background-color: #f1f1f1;
 }
 
-.tag-badge {
-    display: inline-block;
-    background-color: #28a745; /* Green background */
-    color: white; /* White text */
+/* Style the badges for tags */
+.badge {
+    font-size: 0.9rem;
     padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 12px;
-    margin-right: 5px;
-    text-decoration: none; /* Remove underline */
-    text-transform: capitalize;
-    transition: background-color 0.3s ease; /* Smooth hover effect */
-}
-
-.tag-badge:hover {
-    background-color: #218838; /* Darker green on hover */
+    border-radius: 12px;
 }
 
 /* Modal container (hidden by default) */
