@@ -88,9 +88,17 @@
                     {% endfor %}
                 </td>
                 <td>
+                    <!-- View Description Button -->
                     <button type="button" class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#viewDescriptionModal" onclick="setDescription('{{ task.title }}', '{{ task.description }}')">
                         View Description
                     </button>
+                
+                    <!-- Edit Task Button -->
+                    <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editTaskModal" onclick="setEditTask('{{ task.id }}', '{{ task.title }}', '{{ task.description }}', '{{ task.due_date }}', '{{ task.priority }}')">
+                        Edit Task
+                    </button>
+                
+                    <!-- Delete Task Button -->
                     <form action="{{ url_for('delete_task', task_id=task.id) }}" method="POST" style="display: inline;">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this task?')">Delete</button>
                     </form>
@@ -99,6 +107,47 @@
             {% endfor %}
         </tbody>
     </table>
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editTaskModalLabel">Edit Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTaskForm" method="POST" action="">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label for="editTitle" class="form-label">Title</label>
+                        <input type="text" id="editTitle" name="title" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDescription" class="form-label">Description</label>
+                        <textarea id="editDescription" name="description" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDueDate" class="form-label">Due Date</label>
+                        <input type="date" id="editDueDate" name="due_date" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPriority" class="form-label">Priority</label>
+                        <select id="editPriority" name="priority" class="form-select" required>
+                            <option value="Low">Low</option>
+                            <option value="Medium">Medium</option>
+                            <option value="High">High</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTags" class="form-label">Tags</label>
+                        <input type="text" id="editTags" name="tags" class="form-control" placeholder="Enter tags separated by commas">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- View Description Modal -->
     <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -137,5 +186,19 @@
         } else {
             window.location.href = `/`; // Redirect to show all tasks
         }
+    }
+
+    function setEditTask(id, title, description, dueDate, priority, tags) {
+        // Set the form's action to the edit route for the specific task
+        document.getElementById('editTaskForm').action = `/edit/${id}`;
+
+        // Populate the form fields with the task's current details
+        document.getElementById('editTitle').value = title;
+        document.getElementById('editDescription').value = description;
+        document.getElementById('editDueDate').value = dueDate;
+        document.getElementById('editPriority').value = priority;
+
+        // Populate the tags field with the current tags (comma-separated)
+        document.getElementById('editTags').value = tags.join(', ');
     }
 </script>
