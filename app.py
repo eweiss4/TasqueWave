@@ -48,19 +48,22 @@ def add_task():
 
 @app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
-    task = Task.query.get(task_id)
-    if task:
-        db.session.delete(task)
-        db.session.commit()
+    task = Task.query.get_or_404(task_id)
+    db.session.delete(task)
+    db.session.commit()
     return redirect(url_for('index'))
 
-@app.route('/filter/<string:tag_name>')
-def filter_by_tag(tag_name):
-    tag = Tag.query.filter_by(name=tag_name).first()
-    tasks = tag.tasks.order_by(Task.priority.asc(), Task.due_date.asc()).all() if tag else []
-    tags = Tag.query.all()
-    form = TaskForm()  # Create an instance of the TaskForm
-    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name, form=form)
+@app.route('/filter', methods=['GET'])
+def filter_by_tag():
+    tag_name = request.args.get('tag_name')  # Get the tag_name from the query string
+    if tag_name:
+        # Filter tasks by the selected tag
+        tasks = Task.query.join(Task.tags).filter(Tag.name == tag_name).all()
+    else:
+        # If no tag is selected, return all tasks
+        tasks = Task.query.all()
+    tags = Tag.query.order_by(Tag.name.asc()).all()
+    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name)
 
 @app.route('/edit/<int:task_id>', methods=['POST'])
 def edit_task(task_id):
@@ -91,6 +94,17 @@ def edit_task(task_id):
     tasks = Task.query.order_by(Task.priority.asc(), Task.due_date.asc()).all()
     tags = Tag.query.all()
     return render_template('index.html', tasks=tasks, tags=tags, filter_tag=None, form=form)
+
+@app.route('/update_status/<int:task_id>', methods=['POST'])
+def update_status(task_id):
+    task = Task.query.get_or_404(task_id)
+    new_status = request.form.get('status')
+
+    if new_status in ['To Do', 'In Progress', 'Completed']:
+        task.status = new_status
+        db.session.commit()
+
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     with app.app_context():
