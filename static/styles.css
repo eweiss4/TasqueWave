@@ -70,3 +70,9 @@
     color: black;
     text-decoration: none;
 }
+
+.filter-dropdown {
+    width: 200px; /* Set a fixed width for the dropdown */
+    max-width: 100%; /* Ensure it doesn't exceed the container width */
+    display: inline-block; /* Prevent it from stretching to full width */
+}

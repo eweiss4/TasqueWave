@@ -63,7 +63,11 @@ def filter_by_tag():
         # If no tag is selected, return all tasks
         tasks = Task.query.all()
     tags = Tag.query.order_by(Tag.name.asc()).all()
-    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name)
+
+    # Create the form object (if needed)
+    form = TaskForm()  # Replace TaskForm with the actual form class you're using
+
+    return render_template('index.html', tasks=tasks, tags=tags, filter_tag=tag_name, form=form)
 
 @app.route('/edit/<int:task_id>', methods=['POST'])
 def edit_task(task_id):
