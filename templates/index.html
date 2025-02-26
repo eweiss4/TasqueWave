@@ -184,7 +184,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this task? This action cannot be undone.
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -233,6 +232,6 @@
 
     function setDeleteTaskAction(actionUrl, taskTitle) {
         document.getElementById('deleteTaskForm').action = actionUrl;
-        document.querySelector('#deleteConfirmationModal .modal-body').textContent = `Are you sure you want to delete "${taskTitle}"? This action cannot be undone.`;
+        document.querySelector('#deleteConfirmationModal .modal-body').textContent = `Are you sure you want to delete "${taskTitle}"? Associated tags will be deleted unless used by other tasks.`;
     }
 </script>

@@ -49,7 +49,19 @@ def add_task():
 @app.route('/delete/<int:task_id>', methods=['POST'])
 def delete_task(task_id):
     task = Task.query.get_or_404(task_id)
+
+    # Remove the relationship between the task and its tags
+    for tag in task.tags:
+        task.tags.remove(tag)
+
+    # Delete the task itself
     db.session.delete(task)
+
+    # Optionally, delete tags that are no longer associated with any tasks
+    orphaned_tags = Tag.query.filter(~Tag.tasks.any()).all()
+    for tag in orphaned_tags:
+        db.session.delete(tag)
+
     db.session.commit()
     return redirect(url_for('index'))
 
