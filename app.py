@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from extensions import db
 from models import Task, Tag
 from forms import TaskForm
@@ -121,6 +121,21 @@ def update_status(task_id):
         db.session.commit()
 
     return redirect(url_for('index'))
+
+@app.route('/tags', methods=['GET'])
+def get_tags():
+    tags = Tag.query.order_by(Tag.name.asc()).all()  # Fetch all tags sorted alphabetically
+    return jsonify([{'id': tag.id, 'name': tag.name} for tag in tags])  # Return tags as JSON
+
+@app.route('/delete_tags', methods=['POST'])
+def delete_tags():
+    tag_ids = request.json.get('tag_ids', [])  # Get the list of tag IDs to delete
+    for tag_id in tag_ids:
+        tag = Tag.query.get(tag_id)
+        if tag:
+            db.session.delete(tag)  # Delete the tag
+    db.session.commit()
+    return jsonify({'message': 'Tags deleted successfully'})
 
 if __name__ == '__main__':
     with app.app_context():

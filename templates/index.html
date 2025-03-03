@@ -16,6 +16,10 @@
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTaskModal">
         Add a Task
     </button>
+    <!-- Button to Open the Tag Delete Modal -->
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#tagModal">
+        Manage Tags
+    </button>
 <div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -157,6 +161,26 @@
         </div>
     </div>
 </div>
+<!-- Tag Delete Modal -->
+<div class="modal fade" id="tagModal" tabindex="-1" aria-labelledby="tagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tagModalLabel">Manage Tags</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul id="tagList" class="list-group">
+                    <!-- Tags will be dynamically loaded here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="deleteTagsButton">Delete Selected Tags</button>
+            </div>
+        </div>
+    </div>
+</div>
     <!-- View Description Modal -->
     <div class="modal fade" id="viewDescriptionModal" tabindex="-1" aria-labelledby="viewDescriptionModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -234,4 +258,52 @@
         document.getElementById('deleteTaskForm').action = actionUrl;
         document.querySelector('#deleteConfirmationModal .modal-body').textContent = `Are you sure you want to delete "${taskTitle}"? Associated tags will be deleted unless used by other tasks.`;
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const tagList = document.getElementById('tagList');
+        const deleteTagsButton = document.getElementById('deleteTagsButton');
+
+        // Fetch tags when the modal is opened
+        document.getElementById('tagModal').addEventListener('show.bs.modal', function () {
+            fetch('/tags')
+                .then(response => response.json())
+                .then(tags => {
+                    tagList.innerHTML = ''; // Clear the list
+                    tags.forEach(tag => {
+                        const listItem = document.createElement('li');
+                        listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                        listItem.innerHTML = `
+                            <span>${tag.name}</span>
+                            <input type="checkbox" class="form-check-input" value="${tag.id}">
+                        `;
+                        tagList.appendChild(listItem);
+                    });
+                });
+        });
+
+        // Handle tag deletion
+        deleteTagsButton.addEventListener('click', function () {
+            const selectedTagIds = Array.from(tagList.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            if (selectedTagIds.length === 0) {
+                alert('Please select at least one tag to delete.');
+                return;
+            }
+
+            fetch('/delete_tags', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tag_ids: selectedTagIds }),
+            })
+                .then(response => response.json())
+                .then(data => {
+                    alert(data.message);
+                    // Refresh the tag list
+                    document.getElementById('tagModal').dispatchEvent(new Event('show.bs.modal'));
+                });
+        });
+    });
 </script>
