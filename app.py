@@ -12,6 +12,8 @@ app.config['SECRET_KEY'] = 'your_secret_key'
 # Initialize the app with extensions
 db.init_app(app)
 
+# App routes were made with AI assistance
+
 @app.route('/')
 def index():
     tasks = Task.query.order_by(Task.priority.asc(), Task.due_date.asc()).all()
